@@ -1,9 +1,9 @@
 use {
     crate::{state::*, utils::*},
     anchor_lang::{prelude::*, solana_program::system_program},
-    indexor::{
+    index_program::{
         cpi::{accounts::CreateIndex, create_index},
-        program::Indexor,
+        program::IndexProgram,
         state::Index,
     },
 };
@@ -21,8 +21,8 @@ pub struct CreatePaymentIndex<'info> {
     #[account(mut)]
     pub index: Account<'info, Index>,
 
-    #[account(address = indexor::ID)]
-    pub indexor_program: Program<'info, Indexor>,
+    #[account(address = index_program::ID)]
+    pub index_program: Program<'info, IndexProgram>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -40,14 +40,14 @@ pub fn handler(
     // Get accounts.
     let authority = &ctx.accounts.authority;
     let index = &ctx.accounts.index;
-    let indexor_program = &ctx.accounts.indexor_program;
+    let index_program = &ctx.accounts.index_program;
     let system_program = &ctx.accounts.system_program;
 
     // Create an index to lookup payments by (party, role) pairs.
     // (e.g. all the payments where Alice is a creditor or Bob is a debtor)
     create_index(
         CpiContext::new_with_signer(
-            indexor_program.to_account_info(),
+            index_program.to_account_info(),
             CreateIndex {
                 index: index.to_account_info(),
                 owner: authority.to_account_info(),

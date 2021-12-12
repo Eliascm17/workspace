@@ -5,9 +5,9 @@ use {
         solana_program::{program::invoke, system_instruction, system_program},
     },
     anchor_spl::token::{approve, Approve, Mint, Token, TokenAccount},
-    indexor::{
+    index_program::{
         cpi::{accounts::CreatePointer, create_pointer},
-        program::Indexor,
+        program::IndexProgram,
         state::*,
     },
     std::mem::size_of,
@@ -50,7 +50,7 @@ pub struct CreatePayment<'info> {
             payment_index_namespace(creditor.key(), Role::Creditor).as_bytes(),
         ],
         bump = creditor_payment_index.bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub creditor_payment_index: Account<'info, Index>,
 
@@ -62,7 +62,7 @@ pub struct CreatePayment<'info> {
             creditor_payment_index.count.to_string().as_bytes()
         ],
         bump = creditor_payment_pointer_bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub creditor_payment_pointer: Account<'info, Pointer>,
 
@@ -74,7 +74,7 @@ pub struct CreatePayment<'info> {
             payment.key().as_ref(),
         ],
         bump = creditor_payment_proof_bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub creditor_payment_proof: Account<'info, Proof>,
 
@@ -95,7 +95,7 @@ pub struct CreatePayment<'info> {
             payment_index_namespace(debtor.key(), Role::Debtor).as_bytes(),
         ],
         bump = debtor_payment_index.bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub debtor_payment_index: Account<'info, Index>,
 
@@ -107,7 +107,7 @@ pub struct CreatePayment<'info> {
             debtor_payment_index.count.to_string().as_bytes()
         ],
         bump = debtor_payment_pointer_bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub debtor_payment_pointer: Account<'info, Pointer>,
 
@@ -119,7 +119,7 @@ pub struct CreatePayment<'info> {
             payment.key().as_ref(),
         ],
         bump = debtor_payment_proof_bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub debtor_payment_proof: Account<'info, Proof>,
 
@@ -130,8 +130,8 @@ pub struct CreatePayment<'info> {
     )]
     pub debtor_tokens: Account<'info, TokenAccount>,
 
-    #[account(address = indexor::ID)]
-    pub indexor_program: Program<'info, Indexor>,
+    #[account(address = index_program::ID)]
+    pub index_program: Program<'info, IndexProgram>,
 
     #[account()]
     pub mint: Account<'info, Mint>,
@@ -173,7 +173,7 @@ pub struct CreatePayment<'info> {
             task_index_namespace(start_at).as_bytes(),
         ],
         bump = task_index.bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub task_index: Account<'info, Index>,
 
@@ -185,7 +185,7 @@ pub struct CreatePayment<'info> {
             task_index.count.to_string().as_bytes(),
         ],
         bump = task_pointer_bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub task_pointer: Account<'info, Pointer>,
 
@@ -197,7 +197,7 @@ pub struct CreatePayment<'info> {
             task.key().as_ref(),
         ],
         bump = task_proof_bump,
-        owner = indexor::ID,
+        owner = index_program::ID,
     )]
     pub task_proof: Account<'info, Proof>,
 
@@ -234,7 +234,7 @@ pub fn handler(
     let debtor_payment_pointer = &ctx.accounts.debtor_payment_pointer;
     let debtor_payment_proof = &ctx.accounts.debtor_payment_proof;
     let debtor_tokens = &mut ctx.accounts.debtor_tokens;
-    let indexor_program = &ctx.accounts.indexor_program;
+    let index_program = &ctx.accounts.index_program;
     let mint = &ctx.accounts.mint;
     let payment = &mut ctx.accounts.payment;
     let system_program = &ctx.accounts.system_program;
@@ -321,7 +321,7 @@ pub fn handler(
     // Create pointer to payment in creditor's payment index.
     create_pointer(
         CpiContext::new_with_signer(
-            indexor_program.to_account_info(), 
+            index_program.to_account_info(), 
             CreatePointer {
                 index: creditor_payment_index.to_account_info(),
                 pointer: creditor_payment_pointer.to_account_info(),
@@ -340,7 +340,7 @@ pub fn handler(
     // Create pointer to payment in debtor's payment index.
     create_pointer(
         CpiContext::new_with_signer(
-            indexor_program.to_account_info(), 
+            index_program.to_account_info(), 
             CreatePointer {
                 index: debtor_payment_index.to_account_info(),
                 pointer: debtor_payment_pointer.to_account_info(),
@@ -359,7 +359,7 @@ pub fn handler(
     // Create pointer to task in time-bound task index.
     create_pointer(
         CpiContext::new_with_signer(
-            indexor_program.to_account_info(), 
+            index_program.to_account_info(), 
             CreatePointer {
                 index: task_index.to_account_info(),
                 pointer: task_pointer.to_account_info(),

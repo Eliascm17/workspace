@@ -598,10 +598,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "indexor"
-version = "0.5.0"
+name = "index-program"
+version = "0.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e094030775d9a1024a49f1bbeef6609ca6c734c217f0fbdc1ef443bd76b7e983"
+checksum = "3f4137a3c8222a96b31ed080cd7979121cc02dcb4d89cab546a69ebe8711c196"
 dependencies = [
  "anchor-lang",
 ]
@@ -817,7 +817,7 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "indexor",
+ "index-program 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "solana-program",
 ]
 

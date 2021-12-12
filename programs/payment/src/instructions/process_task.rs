@@ -1,9 +1,8 @@
-use indexor::state::Index;
-
 use {
     crate::state,
     anchor_lang::{prelude::*, solana_program::system_program},
     anchor_spl::token::{transfer, Token, TokenAccount, Transfer},
+    index_program::state::*,
 };
 
 #[derive(Accounts)]
