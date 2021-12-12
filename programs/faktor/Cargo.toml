@@ -1,0 +1,26 @@
+[package]
+name = "faktor"
+version = "0.1.0"
+description = "Schedule one-time and recurring token transfers on Solana"
+edition = "2018"
+license = "MIT"
+homepage = "https://faktor.finance"
+repository = "https://github.com/faktorfi/programs"
+documentation = "https://faktor.finance"
+readme = "README.md"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "faktor"
+
+[features]
+no-entrypoint = []
+no-idl = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.19.0"
+anchor-spl = "0.19.0"
+indexor = { version = "0.5.0", features = ["cpi"] }
+solana-program = "1.6.9"

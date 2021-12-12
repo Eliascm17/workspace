@@ -1,0 +1,24 @@
+[package]
+name = "indexor"
+version = "0.5.0"
+description = "Virtual namespaces for indexing Solana accounts on-chain"
+edition = "2018"
+license = "MIT"
+homepage = "https://faktor.finance"
+repository = "https://github.com/faktorfi/programs"
+documentation = "https://faktor.finance"
+readme = "README.md"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "indexor"
+
+[features]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+anchor-lang = "0.19.0"

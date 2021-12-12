@@ -1,0 +1,13 @@
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[programs.localnet]
+indexor = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+faktor = "3uvTgoiGSBz6ntktxo3gwTJY3wDfG73LGNc21AHYiJg2"
+
+[registry]
+url = "https://anchor.projectserum.com"
+
+[scripts]
+test = "node_modules/ts-mocha/bin/ts-mocha -p ./tsconfig.json -t 1000000 tests/**/*.test.ts"
