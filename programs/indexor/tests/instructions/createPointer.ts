@@ -16,10 +16,10 @@ export type CreatePointerProps = {
   value: PublicKey;
 };
 
-export async function createPointer(
+export function createPointer(
   indexor: Program<Indexor>,
   { indexPDA, pointerPDA, proofPDA, owner, name, value }: CreatePointerProps
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return indexor.instruction.createPointer(
     name,
     value,

@@ -1,4 +1,5 @@
 import * as anchor from "@project-serum/anchor";
+import assert from "assert";
 import { BN, Provider } from "@project-serum/anchor";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
@@ -18,21 +19,18 @@ import {
 //   validateTaskIndexAccountData,
 //   validateTreasuryAccountData,
 // } from "../../../tests/utils/validate";
-import { dateToSeconds, newSigner, PDA } from "../../../utils";
+import {
+  dateToSeconds,
+  findPDA,
+  newSigner,
+  PDA,
+  signAndSubmit,
+} from "../../../utils";
+import { initializeProgram } from "./instructions";
+import { SEED_AUTHORITY, SEED_CONFIG, SEED_TREASURY } from "./seeds";
 
 // Mints
 const WSOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
-
-// Seeds
-const SEED_AUTHORITY = Buffer.from("aut");
-const SEED_CONFIG = Buffer.from("cfg");
-const SEED_CREDITOR_PAYMENT_REF_INDEX = Buffer.from("crd_pay_ref_idx");
-const SEED_DEBTOR_PAYMENT_INDEX = Buffer.from("dbt_pay_idx");
-const SEED_PAYMENT = Buffer.from("pay");
-const SEED_PAYMENT_REF = Buffer.from("pay_ref");
-const SEED_TASK = Buffer.from("tsk");
-const SEED_TASK_INDEX = Buffer.from("tsk_idx");
-const SEED_TREASURY = Buffer.from("trs");
 
 // Time
 const ONE_MINUTE = 60;
@@ -40,7 +38,7 @@ const ONE_MINUTE = 60;
 describe("faktor", () => {
   // Test environment
   const provider = Provider.local();
-  const program = (anchor as any).workspace.Faktor;
+  const faktor = (anchor as any).workspace.Faktor;
   anchor.setProvider(provider);
 
   // Shared data
@@ -51,28 +49,9 @@ describe("faktor", () => {
   let taskIndexProcessAt: number;
 
   before(async () => {
-    const [authorityAddress, authorityBump] =
-      await PublicKey.findProgramAddress([SEED_AUTHORITY], program.programId);
-    authorityPDA = {
-      address: authorityAddress,
-      bump: authorityBump,
-    };
-    const [configAddress, configBump] = await PublicKey.findProgramAddress(
-      [SEED_CONFIG],
-      program.programId
-    );
-    configPDA = {
-      address: configAddress,
-      bump: configBump,
-    };
-    const [treasuryAddress, treasuryBump] = await PublicKey.findProgramAddress(
-      [SEED_TREASURY],
-      program.programId
-    );
-    treasuryPDA = {
-      address: treasuryAddress,
-      bump: treasuryBump,
-    };
+    authorityPDA = await findPDA([SEED_AUTHORITY], faktor.programId);
+    configPDA = await findPDA([SEED_CONFIG], faktor.programId);
+    treasuryPDA = await findPDA([SEED_TREASURY], faktor.programId);
     creditor = await newSigner(provider.connection);
     debtor = await newSigner(provider.connection);
     worker = await newSigner(provider.connection);
@@ -84,35 +63,32 @@ describe("faktor", () => {
     const transferFeeDistributor = 1000;
     const transferFeeProgram = 1000;
 
-    // Run test.
-    await program.rpc.initializeProgram(
-      new BN(transferFeeDistributor),
-      new BN(transferFeeProgram),
-      authorityPDA.bump,
-      configPDA.bump,
-      treasuryPDA.bump,
-      {
-        accounts: {
-          authority: authorityPDA.address,
-          config: configPDA.address,
-          signer: signer.publicKey,
-          systemProgram: SystemProgram.programId,
-          treasury: treasuryPDA.address,
-        },
-        signers: [signer],
-      }
-    );
+    // Create instructions.
+    const ix = initializeProgram(faktor, {
+      authorityPDA,
+      configPDA,
+      treasuryPDA,
+      signer: signer.publicKey,
+      transferFeeDistributor,
+      transferFeeProgram,
+    });
 
-    // Validate state.
-    // TODO validate authority account data
-    // await validateConfigAccountData(program, configPDA.address, {
-    //   transferFeeDistributor,
-    //   transferFeeProgram,
-    //   bump: configPDA.bump,
-    // });
-    // await validateTreasuryAccountData(program, treasuryPDA.address, {
-    //   bump: treasuryPDA.bump,
-    // });
+    // Sign and submit transaction.
+    await signAndSubmit(faktor.provider.connection, [ix], signer);
+
+    // Validate config account data.
+    const configData = await faktor.account.config.fetch(configPDA.address);
+    assert.ok(
+      configData.transferFeeDistributor.toNumber() === transferFeeDistributor
+    );
+    assert.ok(configData.transferFeeProgram.toNumber() === transferFeeProgram);
+    assert.ok(configData.bump === configPDA.bump);
+
+    // Validate treasury account data.
+    const treasuryData = await faktor.account.treasury.fetch(
+      treasuryPDA.address
+    );
+    assert.ok(treasuryData.bump === treasuryPDA.bump);
   });
 
   // it("creates a creditor payment index", async () => {

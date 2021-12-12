@@ -35,7 +35,7 @@ describe("indexor", () => {
     );
 
     // Generate instructions.
-    const ix = await createIndex(indexor, {
+    const ix = createIndex(indexor, {
       indexPDA: indexPDA,
       owner: owner.publicKey,
       namespace: namespaceSerial,
@@ -75,7 +75,7 @@ describe("indexor", () => {
     );
 
     // Generate instructions.
-    const ix = await createPointer(indexor, {
+    const ix = createPointer(indexor, {
       indexPDA,
       pointerPDA,
       proofPDA,
@@ -128,7 +128,7 @@ describe("indexor", () => {
     );
 
     // Generate instructions.
-    const ix = await createPointer(indexor, {
+    const ix = createPointer(indexor, {
       indexPDA,
       pointerPDA,
       proofPDA,
@@ -168,7 +168,7 @@ describe("indexor", () => {
     );
 
     // Generate instructions.
-    const ix = await createIndex(indexor, {
+    const ix = createIndex(indexor, {
       indexPDA: indexPDA,
       owner: owner.publicKey,
       namespace: namespace,
@@ -205,7 +205,7 @@ describe("indexor", () => {
     );
 
     // Generate instructions.
-    const ix = await createPointer(indexor, {
+    const ix = createPointer(indexor, {
       indexPDA,
       pointerPDA,
       proofPDA,
@@ -255,7 +255,7 @@ describe("indexor", () => {
     );
 
     // Generate instructions.
-    const ix = await createPointer(indexor, {
+    const ix = createPointer(indexor, {
       indexPDA,
       pointerPDA,
       proofPDA,

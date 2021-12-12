@@ -14,10 +14,10 @@ export type CreateIndexProps = {
   isSerial: boolean;
 };
 
-export async function createIndex(
+export function createIndex(
   indexor: Program<Indexor>,
   { indexPDA, owner, namespace, isSerial }: CreateIndexProps
-): Promise<TransactionInstruction> {
+): TransactionInstruction {
   return indexor.instruction.createIndex(namespace, isSerial, indexPDA.bump, {
     accounts: {
       index: indexPDA.address,

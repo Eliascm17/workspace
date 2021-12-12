@@ -1,0 +1,9 @@
+export const SEED_AUTHORITY = Buffer.from("aut");
+export const SEED_CONFIG = Buffer.from("cfg");
+export const SEED_CREDITOR_PAYMENT_REF_INDEX = Buffer.from("crd_pay_ref_idx");
+export const SEED_DEBTOR_PAYMENT_INDEX = Buffer.from("dbt_pay_idx");
+export const SEED_PAYMENT = Buffer.from("pay");
+export const SEED_PAYMENT_REF = Buffer.from("pay_ref");
+export const SEED_TASK = Buffer.from("tsk");
+export const SEED_TASK_INDEX = Buffer.from("tsk_idx");
+export const SEED_TREASURY = Buffer.from("trs");
