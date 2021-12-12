@@ -1,6 +1,6 @@
 # 🔢 Index Program
 
-The **Index Program** creates virtual namespaces for indexing Solana accounts on-chain. These indicies are [key-value stores (KVS)](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) and can be used to map account addresses to more predictable names. Indexor supports creating indicies with either serial namespaces (0, 1, 2, 3 ... like an array) or freeform namespaces ("foo", "bar", "baz" ... like a hashmap). It additionally supports an algorithm for constant-time "reverse-lookup" searches from an address to its name in an index.
+The **Index Program** can create virtual namespaces for indexing Solana accounts on-chain. It provides [key-value stores (KVS)](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) for mapping account addresses to more predictable names. It supports creating indicies with either serial namespaces (0, 1, 2, 3 ... like an array) or freeform namespaces ("foo", "bar", "baz" ... like a hashmap). It additionally supports constant-time "reverse-lookup" searches from an address to its name in an index.
 
 ## ⚙️ How It Works
 
