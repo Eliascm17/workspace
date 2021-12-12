@@ -4,7 +4,7 @@ use {
     index_program::{
         cpi::{accounts::CreateIndex, create_index},
         program::IndexProgram,
-        state::Index,
+        state::*,
     },
 };
 
