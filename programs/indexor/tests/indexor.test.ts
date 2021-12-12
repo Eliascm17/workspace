@@ -1,10 +1,14 @@
-import * as anchor from "@project-serum/anchor";
 import assert from "assert";
+
+import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
-import { Keypair, SystemProgram } from "@solana/web3.js";
-import { Indexor } from "../target/types/indexor";
-import { airdrop } from "./utils";
-import { findIndexPDA, findItemPDA, findProofPDA, PDA } from "./utils";
+import { Keypair } from "@solana/web3.js";
+
+import { createIndex, createPointer } from "./instructions";
+import { SEED_INDEX, SEED_POINTER, SEED_PROOF } from "./seeds";
+
+import { Indexor } from "../../../target/types/indexor";
+import { airdrop, findPDA, PDA, signAndSubmit } from "../../../utils";
 
 describe("indexor", () => {
   // Configure the client to use the local cluster.
@@ -24,29 +28,28 @@ describe("indexor", () => {
   });
 
   it("creates a serial index", async () => {
-    // Genereate index PDA.
-    indexPDA = await findIndexPDA(
-      owner.publicKey,
-      namespaceSerial,
+    // Find PDAs.
+    indexPDA = await findPDA(
+      [SEED_INDEX, owner.publicKey.toBuffer(), Buffer.from(namespaceSerial)],
       indexor.programId
     );
 
-    // Run test.
-    const isSerial = true;
-    await indexor.rpc.createIndex(namespaceSerial, isSerial, indexPDA.bump, {
-      accounts: {
-        index: indexPDA.address,
-        owner: owner.publicKey,
-        systemProgram: SystemProgram.programId,
-      },
-      signers: [owner],
+    // Generate instructions.
+    const ix = await createIndex(indexor, {
+      indexPDA: indexPDA,
+      owner: owner.publicKey,
+      namespace: namespaceSerial,
+      isSerial: true,
     });
+
+    // Sign and submit transaction.
+    await signAndSubmit(indexor.provider.connection, [ix], owner);
 
     // Validate index account state.
     const indexData = await indexor.account.index.fetch(indexPDA.address);
     assert.ok(indexData.owner.toString() === owner.publicKey.toString());
     assert.ok(indexData.namespace === namespaceSerial);
-    assert.ok(indexData.isSerial === isSerial);
+    assert.ok(indexData.isSerial === true);
     assert.ok(indexData.count.toNumber() === 0);
     assert.ok(indexData.bump === indexPDA.bump);
   });
@@ -55,37 +58,34 @@ describe("indexor", () => {
     // Get index account data.
     let indexData = await indexor.account.index.fetch(indexPDA.address);
 
-    // Genereate next item PDA.
-    pointerPDA = await findItemPDA(
-      indexPDA.address,
-      indexData.count.toString(),
+    // Find next pointer PDA.
+    pointerPDA = await findPDA(
+      [
+        SEED_POINTER,
+        indexPDA.address.toBuffer(),
+        Buffer.from(indexData.count.toString()),
+      ],
       indexor.programId
     );
 
-    // Generate proof PDA.
-    proofPDA = await findProofPDA(
-      indexPDA.address,
-      pointerA,
+    // Find proof PDA.
+    proofPDA = await findPDA(
+      [SEED_PROOF, indexPDA.address.toBuffer(), pointerA.toBuffer()],
       indexor.programId
     );
 
-    // Run test.
-    await indexor.rpc.createPointer(
-      indexData.count.toString(),
-      pointerA,
-      pointerPDA.bump,
-      proofPDA.bump,
-      {
-        accounts: {
-          index: indexPDA.address,
-          pointer: pointerPDA.address,
-          proof: proofPDA.address,
-          owner: owner.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-        signers: [owner],
-      }
-    );
+    // Generate instructions.
+    const ix = await createPointer(indexor, {
+      indexPDA,
+      pointerPDA,
+      proofPDA,
+      owner: owner.publicKey,
+      name: indexData.count.toString(),
+      value: pointerA,
+    });
+
+    // Sign and submit transaction.
+    await signAndSubmit(indexor.provider.connection, [ix], owner);
 
     // Validate index account data.
     indexData = await indexor.account.index.fetch(indexPDA.address);
@@ -111,37 +111,34 @@ describe("indexor", () => {
     // Get index account data.
     let indexData = await indexor.account.index.fetch(indexPDA.address);
 
-    // Genereate next item PDA.
-    pointerPDA = await findItemPDA(
-      indexPDA.address,
-      indexData.count.toString(),
+    // Find next pointer PDA.
+    pointerPDA = await findPDA(
+      [
+        SEED_POINTER,
+        indexPDA.address.toBuffer(),
+        Buffer.from(indexData.count.toString()),
+      ],
       indexor.programId
     );
 
-    // Generate proof PDA.
-    proofPDA = await findProofPDA(
-      indexPDA.address,
-      pointerB,
+    // Find proof PDA.
+    proofPDA = await findPDA(
+      [SEED_PROOF, indexPDA.address.toBuffer(), pointerB.toBuffer()],
       indexor.programId
     );
 
-    // Run test.
-    await indexor.rpc.createPointer(
-      indexData.count.toString(),
-      pointerB,
-      pointerPDA.bump,
-      proofPDA.bump,
-      {
-        accounts: {
-          index: indexPDA.address,
-          pointer: pointerPDA.address,
-          proof: proofPDA.address,
-          owner: owner.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-        signers: [owner],
-      }
-    );
+    // Generate instructions.
+    const ix = await createPointer(indexor, {
+      indexPDA,
+      pointerPDA,
+      proofPDA,
+      owner: owner.publicKey,
+      name: indexData.count.toString(),
+      value: pointerB,
+    });
+
+    // Sign and submit transaction.
+    await signAndSubmit(indexor.provider.connection, [ix], owner);
 
     // Validate index account data.
     indexData = await indexor.account.index.fetch(indexPDA.address);
@@ -164,22 +161,22 @@ describe("indexor", () => {
   });
 
   it("creates a freeform index", async () => {
-    // Genereate index PDA.
-    indexPDA = await findIndexPDA(
-      owner.publicKey,
-      namespace,
+    // Find index PDA.
+    indexPDA = await findPDA(
+      [SEED_INDEX, owner.publicKey.toBuffer(), Buffer.from(namespace)],
       indexor.programId
     );
 
-    // Run test.
-    await indexor.rpc.createIndex(namespace, false, indexPDA.bump, {
-      accounts: {
-        index: indexPDA.address,
-        owner: owner.publicKey,
-        systemProgram: SystemProgram.programId,
-      },
-      signers: [owner],
+    // Generate instructions.
+    const ix = await createIndex(indexor, {
+      indexPDA: indexPDA,
+      owner: owner.publicKey,
+      namespace: namespace,
+      isSerial: false,
     });
+
+    // Sign and submit transaction.
+    await signAndSubmit(indexor.provider.connection, [ix], owner);
 
     // Validate index account state.
     const indexData = await indexor.account.index.fetch(indexPDA.address);
@@ -194,34 +191,31 @@ describe("indexor", () => {
     // Get index account data.
     let indexData = await indexor.account.index.fetch(indexPDA.address);
 
-    // Genereate next item PDA.
+    // Find next pointer PDA.
     let name = "foo";
-    pointerPDA = await findItemPDA(indexPDA.address, name, indexor.programId);
-
-    // Generate proof PDA.
-    proofPDA = await findProofPDA(
-      indexPDA.address,
-      pointerA,
+    pointerPDA = await findPDA(
+      [SEED_POINTER, indexPDA.address.toBuffer(), Buffer.from(name)],
       indexor.programId
     );
 
-    // Run test.
-    await indexor.rpc.createPointer(
-      name,
-      pointerA,
-      pointerPDA.bump,
-      proofPDA.bump,
-      {
-        accounts: {
-          index: indexPDA.address,
-          pointer: pointerPDA.address,
-          proof: proofPDA.address,
-          owner: owner.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-        signers: [owner],
-      }
+    // Find proof PDA.
+    proofPDA = await findPDA(
+      [SEED_PROOF, indexPDA.address.toBuffer(), pointerA.toBuffer()],
+      indexor.programId
     );
+
+    // Generate instructions.
+    const ix = await createPointer(indexor, {
+      indexPDA,
+      pointerPDA,
+      proofPDA,
+      owner: owner.publicKey,
+      name: name,
+      value: pointerA,
+    });
+
+    // Sign and submit transaction.
+    await signAndSubmit(indexor.provider.connection, [ix], owner);
 
     // Validate index account data.
     indexData = await indexor.account.index.fetch(indexPDA.address);
@@ -247,34 +241,31 @@ describe("indexor", () => {
     // Get index account data.
     let indexData = await indexor.account.index.fetch(indexPDA.address);
 
-    // Genereate next item PDA.
+    // Find next pointer PDA.
     let name = "bar";
-    pointerPDA = await findItemPDA(indexPDA.address, name, indexor.programId);
-
-    // Generate proof PDA.
-    proofPDA = await findProofPDA(
-      indexPDA.address,
-      pointerB,
+    pointerPDA = await findPDA(
+      [SEED_POINTER, indexPDA.address.toBuffer(), Buffer.from(name)],
       indexor.programId
     );
 
-    // Run test.
-    await indexor.rpc.createPointer(
-      name,
-      pointerB,
-      pointerPDA.bump,
-      proofPDA.bump,
-      {
-        accounts: {
-          index: indexPDA.address,
-          pointer: pointerPDA.address,
-          proof: proofPDA.address,
-          owner: owner.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-        signers: [owner],
-      }
+    // Find proof PDA.
+    proofPDA = await findPDA(
+      [SEED_PROOF, indexPDA.address.toBuffer(), pointerB.toBuffer()],
+      indexor.programId
     );
+
+    // Generate instructions.
+    const ix = await createPointer(indexor, {
+      indexPDA,
+      pointerPDA,
+      proofPDA,
+      owner: owner.publicKey,
+      name: name,
+      value: pointerB,
+    });
+
+    // Sign and submit transaction.
+    await signAndSubmit(indexor.provider.connection, [ix], owner);
 
     // Validate index account data.
     indexData = await indexor.account.index.fetch(indexPDA.address);

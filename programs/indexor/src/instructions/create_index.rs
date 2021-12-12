@@ -3,7 +3,7 @@ use {
         prelude::*,
         solana_program::system_program
     },
-    crate::state,
+    crate::state::*,
     std::mem::size_of
 };
 
@@ -17,15 +17,15 @@ pub struct CreateIndex<'info> {
     #[account(
         init, 
         seeds = [
-            state::SEED_INDEX, 
+            SEED_INDEX, 
             owner.key().as_ref(), 
             namespace.as_ref()
         ],
         bump = bump, 
         payer = owner, 
-        space = 8 + size_of::<state::Index>()
+        space = 8 + size_of::<Index>()
     )]
-    pub index: Account<'info, state::Index>,
+    pub index: Account<'info, Index>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -52,20 +52,4 @@ pub fn handler(
     index.bump = bump;
     
     return Ok(());
-}
-
-#[test]
-fn it_works() {
-    assert_eq!(2 + 2, 4);
-    let ctx = Context::new(
-        &crate::ID, 
-        CreateIndex {
-            index: None,
-            owner: None,
-            system_program: None,
-        },
-        &[]
-    );
-
-    
 }
