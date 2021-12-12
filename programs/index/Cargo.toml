@@ -1,17 +1,17 @@
 [package]
-name = "indexor"
+name = "index-program"
 version = "0.5.0"
 description = "Virtual namespaces for indexing Solana accounts on-chain"
 edition = "2018"
 license = "MIT"
-homepage = "https://github.com/faktorfi/programs/tree/main/programs/indexor"
+homepage = "https://github.com/faktorfi/programs/tree/main/programs/index"
 repository = "https://github.com/faktorfi/programs"
 documentation = "https://faktor.finance"
 readme = "./README.md"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "indexor"
+name = "index_program"
 
 [features]
 no-entrypoint = []

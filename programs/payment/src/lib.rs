@@ -7,7 +7,7 @@ use {anchor_lang::prelude::*, instructions::*, state::*};
 declare_id!("3uvTgoiGSBz6ntktxo3gwTJY3wDfG73LGNc21AHYiJg2");
 
 #[program]
-pub mod faktor {
+pub mod payment_program {
     use super::*;
     pub fn initialize_program(
         ctx: Context<InitializeProgram>,

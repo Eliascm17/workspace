@@ -6,7 +6,7 @@ use {anchor_lang::prelude::*, instructions::*};
 declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
-pub mod indexor {
+pub mod index_program {
     use super::*;
 
     pub fn create_index(

@@ -1,6 +1,6 @@
 import * as anchor from "@project-serum/anchor";
 import assert from "assert";
-import { BN, Provider } from "@project-serum/anchor";
+import { BN, Program, Provider } from "@project-serum/anchor";
 import { Token, TOKEN_PROGRAM_ID } from "@solana/spl-token";
 import {
   Keypair,
@@ -9,16 +9,6 @@ import {
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
-// import {
-//   validateAccountDoesNotExist,
-//   validateConfigAccountData,
-//   validateCreditorPaymentRefIndexAccountData,
-//   validateDebtorPaymentIndexAccountData,
-//   validatePaymentAccountData,
-//   validateTaskAccountData,
-//   validateTaskIndexAccountData,
-//   validateTreasuryAccountData,
-// } from "../../../tests/utils/validate";
 import {
   dateToSeconds,
   findPDA,
@@ -28,6 +18,7 @@ import {
 } from "../../../utils";
 import { initializeProgram } from "./instructions";
 import { SEED_AUTHORITY, SEED_CONFIG, SEED_TREASURY } from "./seeds";
+import { PaymentProgram } from "../../../target/types/payment_program";
 
 // Mints
 const WSOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
@@ -35,10 +26,11 @@ const WSOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
 // Time
 const ONE_MINUTE = 60;
 
-describe("faktor", () => {
+describe("Payment Program", () => {
   // Test environment
   const provider = Provider.local();
-  const faktor = (anchor as any).workspace.Faktor;
+  const paymentProgram = (anchor as any).workspace
+    .PaymentProgram as Program<PaymentProgram>;
   anchor.setProvider(provider);
 
   // Shared data
@@ -49,9 +41,9 @@ describe("faktor", () => {
   let taskIndexProcessAt: number;
 
   before(async () => {
-    authorityPDA = await findPDA([SEED_AUTHORITY], faktor.programId);
-    configPDA = await findPDA([SEED_CONFIG], faktor.programId);
-    treasuryPDA = await findPDA([SEED_TREASURY], faktor.programId);
+    authorityPDA = await findPDA([SEED_AUTHORITY], paymentProgram.programId);
+    configPDA = await findPDA([SEED_CONFIG], paymentProgram.programId);
+    treasuryPDA = await findPDA([SEED_TREASURY], paymentProgram.programId);
     creditor = await newSigner(provider.connection);
     debtor = await newSigner(provider.connection);
     worker = await newSigner(provider.connection);
@@ -64,7 +56,7 @@ describe("faktor", () => {
     const transferFeeProgram = 1000;
 
     // Create instructions.
-    const ix = initializeProgram(faktor, {
+    const ix = initializeProgram(paymentProgram, {
       authorityPDA,
       configPDA,
       treasuryPDA,
@@ -74,10 +66,12 @@ describe("faktor", () => {
     });
 
     // Sign and submit transaction.
-    await signAndSubmit(faktor.provider.connection, [ix], signer);
+    await signAndSubmit(paymentProgram.provider.connection, [ix], signer);
 
     // Validate config account data.
-    const configData = await faktor.account.config.fetch(configPDA.address);
+    const configData = await paymentProgram.account.config.fetch(
+      configPDA.address
+    );
     assert.ok(
       configData.transferFeeDistributor.toNumber() === transferFeeDistributor
     );
@@ -85,7 +79,7 @@ describe("faktor", () => {
     assert.ok(configData.bump === configPDA.bump);
 
     // Validate treasury account data.
-    const treasuryData = await faktor.account.treasury.fetch(
+    const treasuryData = await paymentProgram.account.treasury.fetch(
       treasuryPDA.address
     );
     assert.ok(treasuryData.bump === treasuryPDA.bump);

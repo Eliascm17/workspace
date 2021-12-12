@@ -4,7 +4,7 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { Faktor } from "../../../../target/types/faktor";
+import { PaymentProgram } from "../../../../target/types/payment_program";
 import { PDA } from "../../../../utils";
 
 export type initializeProgramProps = {
@@ -17,7 +17,7 @@ export type initializeProgramProps = {
 };
 
 export function initializeProgram(
-  faktor: Program<Faktor>,
+  paymentProgram: Program<PaymentProgram>,
   {
     authorityPDA,
     configPDA,
@@ -27,7 +27,7 @@ export function initializeProgram(
     transferFeeProgram,
   }: initializeProgramProps
 ): TransactionInstruction {
-  return faktor.instruction.initializeProgram(
+  return paymentProgram.instruction.initializeProgram(
     new BN(transferFeeDistributor),
     new BN(transferFeeProgram),
     authorityPDA.bump,

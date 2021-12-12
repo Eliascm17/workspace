@@ -4,7 +4,7 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { Indexor } from "../../../../target/types/indexor";
+import { IndexProgram } from "../../../../target/types/index_program";
 import { PDA } from "../../../../utils";
 
 export type CreateIndexProps = {
@@ -15,14 +15,19 @@ export type CreateIndexProps = {
 };
 
 export function createIndex(
-  indexor: Program<Indexor>,
+  indexProgram: Program<IndexProgram>,
   { indexPDA, owner, namespace, isSerial }: CreateIndexProps
 ): TransactionInstruction {
-  return indexor.instruction.createIndex(namespace, isSerial, indexPDA.bump, {
-    accounts: {
-      index: indexPDA.address,
-      owner: owner,
-      systemProgram: SystemProgram.programId,
-    },
-  });
+  return indexProgram.instruction.createIndex(
+    namespace,
+    isSerial,
+    indexPDA.bump,
+    {
+      accounts: {
+        index: indexPDA.address,
+        owner: owner,
+        systemProgram: SystemProgram.programId,
+      },
+    }
+  );
 }

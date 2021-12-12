@@ -4,7 +4,7 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { Indexor } from "../../../../target/types/indexor";
+import { IndexProgram } from "../../../../target/types/index_program";
 import { PDA } from "../../../../utils";
 
 export type CreatePointerProps = {
@@ -17,10 +17,10 @@ export type CreatePointerProps = {
 };
 
 export function createPointer(
-  indexor: Program<Indexor>,
+  indexProgram: Program<IndexProgram>,
   { indexPDA, pointerPDA, proofPDA, owner, name, value }: CreatePointerProps
 ): TransactionInstruction {
-  return indexor.instruction.createPointer(
+  return indexProgram.instruction.createPointer(
     name,
     value,
     pointerPDA.bump,

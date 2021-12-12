@@ -1,5 +1,5 @@
 [package]
-name = "faktor"
+name = "payment-program"
 version = "0.1.0"
 description = "Schedule one-time and recurring token transfers on Solana"
 edition = "2018"
@@ -11,7 +11,7 @@ readme = "./README.md"
 
 [lib]
 crate-type = ["cdylib", "lib"]
-name = "faktor"
+name = "payment_program"
 
 [features]
 no-entrypoint = []

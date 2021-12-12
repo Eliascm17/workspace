@@ -3,8 +3,8 @@ cluster = "localnet"
 wallet = "~/.config/solana/id.json"
 
 [programs.localnet]
-indexor = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
-faktor = "3uvTgoiGSBz6ntktxo3gwTJY3wDfG73LGNc21AHYiJg2"
+index_program = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+payment_program = "3uvTgoiGSBz6ntktxo3gwTJY3wDfG73LGNc21AHYiJg2"
 
 [registry]
 url = "https://anchor.projectserum.com"
