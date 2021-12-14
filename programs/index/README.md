@@ -38,9 +38,7 @@ If you spot a bug or want to submit a improvement, join the [Faktor Discord](htt
 
 ## ⚙️ How It Works
 
-<img width="1311" alt="Screen Shot 2021-12-13 at 2 01 21 PM" src="https://user-images.githubusercontent.com/8634334/145928334-86155a55-e721-4d49-b65a-52d0fddc9e5f.png">
-
-
+<img width="1311" alt="Frame 40158" src="https://user-images.githubusercontent.com/8634334/145928977-1381297e-85c7-4590-9633-cd40c527ae26.png">
 
 
 
