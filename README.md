@@ -1,3 +1,3 @@
 # Programs
 
-A collection of Solana programs by Faktor Finance.
+A collection of open-source payments primitives for Solana.
