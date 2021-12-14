@@ -1,4 +1,4 @@
-mod instructions;
+pub mod instructions;
 pub mod state;
 
 use {anchor_lang::prelude::*, instructions::*};
@@ -7,7 +7,7 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 
 #[program]
 pub mod index_program {
-    pub use super::*;
+    use super::*;
 
     pub fn create_index(
         ctx: Context<CreateIndex>,
