@@ -38,7 +38,7 @@ If you spot a bug or want to submit a improvement, join the [Faktor Discord](htt
 
 ## ⚙️ How It Works
 
-<img width="1311" alt="Frame 40158" src="https://user-images.githubusercontent.com/8634334/145928977-1381297e-85c7-4590-9633-cd40c527ae26.png">
+![Frame 40159](https://user-images.githubusercontent.com/8634334/146040947-f246e623-b105-447e-8ab4-bc4a59eabc52.png)
 
 
 
