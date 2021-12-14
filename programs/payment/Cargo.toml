@@ -15,12 +15,9 @@ name = "payment_program"
 
 [features]
 no-entrypoint = []
-no-idl = []
 cpi = ["no-entrypoint"]
-default = []
 
 [dependencies]
 anchor-lang = "0.19.0"
 anchor-spl = "0.19.0"
-index-program = { version = "0.1.0", features = ["cpi"] }
-solana-program = "1.6.9"
+index-program = { path = "../index", features = ["cpi"] }

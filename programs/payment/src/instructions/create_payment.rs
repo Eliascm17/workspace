@@ -1,15 +1,15 @@
 use {
-    crate::{errors::*, state::*, utils::*},
+    crate::{errors::*, state::*},
     anchor_lang::{
         prelude::*,
         solana_program::{program::invoke, system_instruction, system_program},
     },
     anchor_spl::token::{approve, Approve, Mint, Token, TokenAccount},
-    index_program::{
-        cpi::{accounts::CreatePointer, create_pointer},
-        program::IndexProgram,
-        state::*,
-    },
+    // index_program::{
+    //     cpi::{accounts::CreatePointer, create_pointer},
+    //     program::IndexProgram,
+    //     state::*,
+    // },
     std::mem::size_of,
 };
 
@@ -42,41 +42,41 @@ pub struct CreatePayment<'info> {
 
     pub creditor: AccountInfo<'info>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_INDEX, 
-            authority.key().as_ref(), 
-            payment_index_namespace(creditor.key(), Role::Creditor).as_bytes(),
-        ],
-        bump = creditor_payment_index.bump,
-        owner = index_program::ID,
-    )]
-    pub creditor_payment_index: Account<'info, Index>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_INDEX, 
+    //         authority.key().as_ref(), 
+    //         payment_index_namespace(creditor.key(), Role::Creditor).as_bytes(),
+    //     ],
+    //     bump = creditor_payment_index.bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub creditor_payment_index: Account<'info, Index>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_POINTER, 
-            creditor_payment_index.key().as_ref(), 
-            creditor_payment_index.count.to_string().as_bytes()
-        ],
-        bump = creditor_payment_pointer_bump,
-        owner = index_program::ID,
-    )]
-    pub creditor_payment_pointer: Account<'info, Pointer>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_POINTER, 
+    //         creditor_payment_index.key().as_ref(), 
+    //         creditor_payment_index.count.to_string().as_bytes()
+    //     ],
+    //     bump = creditor_payment_pointer_bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub creditor_payment_pointer: Account<'info, Pointer>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_PROOF, 
-            creditor_payment_index.key().as_ref(), 
-            payment.key().as_ref(),
-        ],
-        bump = creditor_payment_proof_bump,
-        owner = index_program::ID,
-    )]
-    pub creditor_payment_proof: Account<'info, Proof>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_PROOF, 
+    //         creditor_payment_index.key().as_ref(), 
+    //         payment.key().as_ref(),
+    //     ],
+    //     bump = creditor_payment_proof_bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub creditor_payment_proof: Account<'info, Proof>,
 
     #[account(
         constraint = creditor_tokens.owner == creditor.key(),
@@ -87,41 +87,41 @@ pub struct CreatePayment<'info> {
     #[account(mut)]
     pub debtor: Signer<'info>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_INDEX, 
-            authority.key().as_ref(), 
-            payment_index_namespace(debtor.key(), Role::Debtor).as_bytes(),
-        ],
-        bump = debtor_payment_index.bump,
-        owner = index_program::ID,
-    )]
-    pub debtor_payment_index: Account<'info, Index>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_INDEX, 
+    //         authority.key().as_ref(), 
+    //         payment_index_namespace(debtor.key(), Role::Debtor).as_bytes(),
+    //     ],
+    //     bump = debtor_payment_index.bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub debtor_payment_index: Account<'info, Index>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_POINTER, 
-            debtor_payment_index.key().as_ref(), 
-            debtor_payment_index.count.to_string().as_bytes()
-        ],
-        bump = debtor_payment_pointer_bump,
-        owner = index_program::ID,
-    )]
-    pub debtor_payment_pointer: Account<'info, Pointer>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_POINTER, 
+    //         debtor_payment_index.key().as_ref(), 
+    //         debtor_payment_index.count.to_string().as_bytes()
+    //     ],
+    //     bump = debtor_payment_pointer_bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub debtor_payment_pointer: Account<'info, Pointer>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_PROOF, 
-            debtor_payment_index.key().as_ref(), 
-            payment.key().as_ref(),
-        ],
-        bump = debtor_payment_proof_bump,
-        owner = index_program::ID,
-    )]
-    pub debtor_payment_proof: Account<'info, Proof>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_PROOF, 
+    //         debtor_payment_index.key().as_ref(), 
+    //         payment.key().as_ref(),
+    //     ],
+    //     bump = debtor_payment_proof_bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub debtor_payment_proof: Account<'info, Proof>,
 
     #[account(
         mut,
@@ -130,8 +130,8 @@ pub struct CreatePayment<'info> {
     )]
     pub debtor_tokens: Account<'info, TokenAccount>,
 
-    #[account(address = index_program::ID)]
-    pub index_program: Program<'info, IndexProgram>,
+    // #[account(address = index_program::ID)]
+    // pub index_program: Program<'info, IndexProgram>,
 
     #[account()]
     pub mint: Account<'info, Mint>,
@@ -141,7 +141,7 @@ pub struct CreatePayment<'info> {
         seeds = [
             SEED_PAYMENT,
             debtor.key().as_ref(),
-            debtor_payment_index.count.to_string().as_bytes(),
+            // debtor_payment_index.count.to_string().as_bytes(),
         ], 
         bump = payment_bump,
         payer = debtor,
@@ -165,41 +165,41 @@ pub struct CreatePayment<'info> {
     )]
     pub task: Account<'info, Task>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_INDEX, 
-            authority.key().as_ref(), 
-            task_index_namespace(start_at).as_bytes(),
-        ],
-        bump = task_index.bump,
-        owner = index_program::ID,
-    )]
-    pub task_index: Account<'info, Index>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_INDEX, 
+    //         authority.key().as_ref(), 
+    //         task_index_namespace(start_at).as_bytes(),
+    //     ],
+    //     bump = task_index.bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub task_index: Account<'info, Index>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_POINTER, 
-            task_index.key().as_ref(), 
-            task_index.count.to_string().as_bytes(),
-        ],
-        bump = task_pointer_bump,
-        owner = index_program::ID,
-    )]
-    pub task_pointer: Account<'info, Pointer>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_POINTER, 
+    //         task_index.key().as_ref(), 
+    //         task_index.count.to_string().as_bytes(),
+    //     ],
+    //     bump = task_pointer_bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub task_pointer: Account<'info, Pointer>,
 
-    #[account(
-        mut,
-        seeds = [
-            SEED_PROOF, 
-            task_index.key().as_ref(), 
-            task.key().as_ref(),
-        ],
-        bump = task_proof_bump,
-        owner = index_program::ID,
-    )]
-    pub task_proof: Account<'info, Proof>,
+    // #[account(
+    //     mut,
+    //     seeds = [
+    //         SEED_PROOF, 
+    //         task_index.key().as_ref(), 
+    //         task.key().as_ref(),
+    //     ],
+    //     bump = task_proof_bump,
+    //     owner = index_program::ID,
+    // )]
+    // pub task_proof: Account<'info, Proof>,
 
     #[account(address = anchor_spl::token::ID)]
     pub token_program: Program<'info, Token>,
@@ -212,36 +212,36 @@ pub fn handler(
     recurrence_interval: u64,
     start_at: u64,
     end_at: u64,
-    creditor_payment_pointer_bump: u8,
-    creditor_payment_proof_bump: u8,
-    debtor_payment_pointer_bump: u8,
-    debtor_payment_proof_bump: u8,
+    _creditor_payment_pointer_bump: u8,
+    _creditor_payment_proof_bump: u8,
+    _debtor_payment_pointer_bump: u8,
+    _debtor_payment_proof_bump: u8,
     payment_bump: u8,
     task_bump: u8,
-    task_pointer_bump: u8,
-    task_proof_bump: u8,
+    _task_pointer_bump: u8,
+    _task_proof_bump: u8,
 ) -> ProgramResult {
     // Get accounts.
-    let authority = &ctx.accounts.authority;
+    let _authority = &ctx.accounts.authority;
     let config = &ctx.accounts.config;
     let creditor = &ctx.accounts.creditor;
     let creditor_tokens = &ctx.accounts.creditor_tokens;
-    let creditor_payment_index = &mut ctx.accounts.creditor_payment_index;
-    let creditor_payment_pointer = &ctx.accounts.creditor_payment_pointer;
-    let creditor_payment_proof = &ctx.accounts.creditor_payment_proof;
+    // let creditor_payment_index = &mut ctx.accounts.creditor_payment_index;
+    // let creditor_payment_pointer = &ctx.accounts.creditor_payment_pointer;
+    // let creditor_payment_proof = &ctx.accounts.creditor_payment_proof;
     let debtor = &mut ctx.accounts.debtor;
-    let debtor_payment_index = &mut ctx.accounts.debtor_payment_index;
-    let debtor_payment_pointer = &ctx.accounts.debtor_payment_pointer;
-    let debtor_payment_proof = &ctx.accounts.debtor_payment_proof;
+    // let debtor_payment_index = &mut ctx.accounts.debtor_payment_index;
+    // let debtor_payment_pointer = &ctx.accounts.debtor_payment_pointer;
+    // let debtor_payment_proof = &ctx.accounts.debtor_payment_proof;
     let debtor_tokens = &mut ctx.accounts.debtor_tokens;
-    let index_program = &ctx.accounts.index_program;
+    // let index_program = &ctx.accounts.index_program;
     let mint = &ctx.accounts.mint;
     let payment = &mut ctx.accounts.payment;
     let system_program = &ctx.accounts.system_program;
     let task = &mut ctx.accounts.task;
-    let task_index = &mut ctx.accounts.task_index;
-    let task_pointer = &mut ctx.accounts.task_pointer;
-    let task_proof = &mut ctx.accounts.task_proof;
+    // let task_index = &mut ctx.accounts.task_index;
+    // let task_pointer = &mut ctx.accounts.task_pointer;
+    // let task_proof = &mut ctx.accounts.task_proof;
     let token_program = &ctx.accounts.token_program;
 
     // Validate payment chronology.
@@ -272,7 +272,7 @@ pub fn handler(
     );
 
     // Save payment data.
-    payment.id = debtor_payment_index.count.to_string(); 
+    // payment.id = debtor_payment_index.count.to_string(); 
     payment.memo = memo;
     payment.debtor = debtor.key();
     payment.debtor_tokens = debtor_tokens.key();
@@ -286,7 +286,7 @@ pub fn handler(
     payment.bump = payment_bump;
 
     // Save task data.
-    task.id = task_index.count.to_string(); 
+    // task.id = task_index.count.to_string(); 
     task.payment = payment.key();
     task.status = TaskStatus::Pending;
     task.bump = task_bump;
@@ -319,61 +319,61 @@ pub fn handler(
     )?;
 
     // Create pointer to payment in creditor's payment index.
-    create_pointer(
-        CpiContext::new_with_signer(
-            index_program.to_account_info(), 
-            CreatePointer {
-                index: creditor_payment_index.to_account_info(),
-                pointer: creditor_payment_pointer.to_account_info(),
-                proof: creditor_payment_proof.to_account_info(),
-                owner: authority.to_account_info(),
-                system_program: system_program.to_account_info(),
-            },
-            &[&[SEED_AUTHORITY, &[authority.bump]]]
-        ), 
-        creditor_payment_index.count.to_string(), 
-        payment.key(), 
-        creditor_payment_pointer_bump, 
-        creditor_payment_proof_bump
-    )?;
+    // create_pointer(
+    //     CpiContext::new_with_signer(
+    //         index_program.to_account_info(), 
+    //         CreatePointer {
+    //             index: creditor_payment_index.to_account_info(),
+    //             pointer: creditor_payment_pointer.to_account_info(),
+    //             proof: creditor_payment_proof.to_account_info(),
+    //             owner: authority.to_account_info(),
+    //             system_program: system_program.to_account_info(),
+    //         },
+    //         &[&[SEED_AUTHORITY, &[authority.bump]]]
+    //     ), 
+    //     creditor_payment_index.count.to_string(), 
+    //     payment.key(), 
+    //     creditor_payment_pointer_bump, 
+    //     creditor_payment_proof_bump
+    // )?;
 
     // Create pointer to payment in debtor's payment index.
-    create_pointer(
-        CpiContext::new_with_signer(
-            index_program.to_account_info(), 
-            CreatePointer {
-                index: debtor_payment_index.to_account_info(),
-                pointer: debtor_payment_pointer.to_account_info(),
-                proof: debtor_payment_proof.to_account_info(),
-                owner: authority.to_account_info(),
-                system_program: system_program.to_account_info(),
-            },
-            &[&[SEED_AUTHORITY, &[authority.bump]]]
-        ), 
-        debtor_payment_index.count.to_string(), 
-        payment.key(), 
-        debtor_payment_pointer_bump, 
-        debtor_payment_proof_bump
-    )?;
+    // create_pointer(
+    //     CpiContext::new_with_signer(
+    //         index_program.to_account_info(), 
+    //         CreatePointer {
+    //             index: debtor_payment_index.to_account_info(),
+    //             pointer: debtor_payment_pointer.to_account_info(),
+    //             proof: debtor_payment_proof.to_account_info(),
+    //             owner: authority.to_account_info(),
+    //             system_program: system_program.to_account_info(),
+    //         },
+    //         &[&[SEED_AUTHORITY, &[authority.bump]]]
+    //     ), 
+    //     debtor_payment_index.count.to_string(), 
+    //     payment.key(), 
+    //     debtor_payment_pointer_bump, 
+    //     debtor_payment_proof_bump
+    // )?;
 
     // Create pointer to task in time-bound task index.
-    create_pointer(
-        CpiContext::new_with_signer(
-            index_program.to_account_info(), 
-            CreatePointer {
-                index: task_index.to_account_info(),
-                pointer: task_pointer.to_account_info(),
-                proof: task_proof.to_account_info(),
-                owner: authority.to_account_info(),
-                system_program: system_program.to_account_info(),
-            },
-            &[&[SEED_AUTHORITY, &[authority.bump]]]
-        ), 
-        task_index.count.to_string(), 
-        task.key(), 
-        task_pointer_bump, 
-        task_proof_bump
-    )?;
+    // create_pointer(
+    //     CpiContext::new_with_signer(
+    //         index_program.to_account_info(), 
+    //         CreatePointer {
+    //             index: task_index.to_account_info(),
+    //             pointer: task_pointer.to_account_info(),
+    //             proof: task_proof.to_account_info(),
+    //             owner: authority.to_account_info(),
+    //             system_program: system_program.to_account_info(),
+    //         },
+    //         &[&[SEED_AUTHORITY, &[authority.bump]]]
+    //     ), 
+    //     task_index.count.to_string(), 
+    //     task.key(), 
+    //     task_pointer_bump, 
+    //     task_proof_bump
+    // )?;
 
     return Ok(());
 }
