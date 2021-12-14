@@ -30,11 +30,6 @@ anchor build
 anchor test
 ```
 
-## 🛠 Build with us
-
-If you spot a bug or want to submit a improvement, join the [Faktor Discord](https://discord.gg/EdsWFHczfy) and come say hello! We're a group of people building [public key infrastructure (PKI)](https://en.wikipedia.org/wiki/Public_key_infrastructure) and [payments systems](https://faktor.finance) on Solana.
-
-
 
 ## ⚙️ How It Works
 
@@ -106,3 +101,7 @@ pub fn handler(ctx: Context<CreateMyIndex>, namespace: String, bump: u8) -> Prog
     )
 }
 ```
+
+## 👋 Get involved
+
+If you spot a bug or want to submit a improvement, join the [Faktor Discord](https://discord.gg/EdsWFHczfy) and come say hello! We're a group of people building [public key infrastructure (PKI)](https://en.wikipedia.org/wiki/Public_key_infrastructure) and [payments systems](https://faktor.finance) on Solana.
