@@ -593,15 +593,15 @@ checksum = "9a3a5bfb195931eeb336b2a7b4d761daec841b97f947d34394601737a7bba5e4"
 [[package]]
 name = "index-program"
 version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3f4137a3c8222a96b31ed080cd7979121cc02dcb4d89cab546a69ebe8711c196"
 dependencies = [
  "anchor-lang",
 ]
 
 [[package]]
 name = "index-program"
-version = "0.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3f4137a3c8222a96b31ed080cd7979121cc02dcb4d89cab546a69ebe8711c196"
+version = "0.1.1"
 dependencies = [
  "anchor-lang",
 ]
@@ -817,7 +817,7 @@ version = "0.1.0"
 dependencies = [
  "anchor-lang",
  "anchor-spl",
- "index-program 0.1.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "index-program 0.1.0",
  "solana-program",
 ]
 
