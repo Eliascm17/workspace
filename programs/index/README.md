@@ -7,7 +7,7 @@ The **Index Program** can create virtual namespaces for indexing Solana accounts
 
 ### Integrate and build
 
-To integrate with the Index program, add it to your dependencies (see [**CPI Examples**](https://github.com/faktorfi/programs/tree/main/programs/index/#cpi-examples) for sample code snippets):
+To integrate with the Index program, add it to your dependencies (see [**CPI Examples**](https://github.com/faktorfi/programs/blob/main/programs/index/README.md#-cpi-examples) for sample code snippets):
 
 ```yaml
 # Cargo.toml
