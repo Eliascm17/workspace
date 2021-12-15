@@ -7,7 +7,7 @@ pub const SEED_INDEX: &[u8] = b"idx";
 #[account]
 pub struct Index {
     pub owner: Pubkey,
-    pub namespace: String,
+    pub namespace: Pubkey,
     pub count: u128,
     pub is_serial: bool,
     pub bump: u8,

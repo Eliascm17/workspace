@@ -9,27 +9,28 @@ import { PDA } from "../../../utils";
 
 export type CreateIndexProps = {
   indexPDA: PDA;
-  // signer: PublicKey;
   owner: PublicKey;
-  namespace: String;
+  payer: PublicKey;
+  namespace: PublicKey;
   isSerial: boolean;
 };
 
 export function createIndex(
   indexProgram: Program<IndexProgram>,
-  { indexPDA, owner, namespace, isSerial }: CreateIndexProps
+  { indexPDA, owner, payer, namespace, isSerial }: CreateIndexProps
 ): // { indexPDA, signer, owner, namespace, isSerial }: CreateIndexProps
 TransactionInstruction {
   return indexProgram.instruction.createIndex(
     // owner,
-    namespace,
+    // namespace,
     isSerial,
     indexPDA.bump,
     {
       accounts: {
         index: indexPDA.address,
-        payer: owner,
         owner: owner,
+        payer: payer,
+        namespace: namespace,
         systemProgram: SystemProgram.programId,
       },
     }

@@ -10,7 +10,7 @@ use {
 #[derive(Accounts)]
 #[instruction(
     // owner: Pubkey,
-    namespace: String,
+    // namespace: String,
     is_serial: bool,
     bump: u8,
 )]
@@ -20,13 +20,16 @@ pub struct CreateIndex<'info> {
         seeds = [
             SEED_INDEX, 
             owner.key().as_ref(),
-            namespace.as_ref()
+            namespace.key().as_ref()
         ],
         bump = bump, 
         payer = payer, 
         space = 8 + size_of::<Index>()
     )]
     pub index: Account<'info, Index>,
+
+    #[account()]
+    pub namespace: AccountInfo<'info>,
 
     #[account(mut)]
     pub owner: Signer<'info>,
@@ -41,17 +44,18 @@ pub struct CreateIndex<'info> {
 pub fn handler(
     ctx: Context<CreateIndex>, 
     // owner: Pubkey,
-    namespace: String,
+    // namespace: String,
     is_serial: bool,
     bump: u8,
 ) -> ProgramResult {
     // Get accounts.
     let index = &mut ctx.accounts.index;
+    let namespace = &ctx.accounts.namespace;
     let owner = &ctx.accounts.owner;
 
     // Initialize index account.
     index.owner = owner.key();
-    index.namespace = namespace;
+    index.namespace = namespace.key();
     index.count = 0;
     index.is_serial = is_serial;
     index.bump = bump;

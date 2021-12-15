@@ -83,19 +83,22 @@ pub fn handler(ctx: Context<CreateMyIndex>, bump: u8) -> ProgramResult {
     let index_program = &ctx.accounts.index_program;
     let system_program = &ctx.accounts.system_program;
 
+    // TODO Create your own namespace accounts.
+    let namespace = Pubkey::new_unique();
+
     // Create an index owned by the program authority.
     create_index(
         CpiContext::new_with_signer(
             index_program.to_account_info(),
             CreateIndex {
                 index: index.to_account_info(),
+                namespace: namespace,
                 owner: authority.to_account_info(),
                 payer: signer.to_account_info(),
                 system_program: system_program.to_account_info(),
             },
             &[&[SEED_AUTHORITY, &[authority.bump]]],
         ),
-        String::from("abc"),
         true,
         bump,
     )

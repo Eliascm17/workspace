@@ -4,30 +4,21 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { PaymentProgram } from "../../../target/types/payment_program";
-import { PDA } from "../../../utils";
+import { program } from "..";
+import { authorityPDA, configPDA, treasuryPDA } from "../pda";
 
-export type initializeProgramProps = {
-  authorityPDA: PDA;
-  configPDA: PDA;
-  treasuryPDA: PDA;
+export type InitializeProgramProps = {
   signer: PublicKey;
   transferFeeDistributor: number;
   transferFeeProgram: number;
 };
 
-export function initializeProgram(
-  paymentProgram: Program<PaymentProgram>,
-  {
-    authorityPDA,
-    configPDA,
-    treasuryPDA,
-    signer,
-    transferFeeDistributor,
-    transferFeeProgram,
-  }: initializeProgramProps
-): TransactionInstruction {
-  return paymentProgram.instruction.initializeProgram(
+export function initializeProgram({
+  signer,
+  transferFeeDistributor,
+  transferFeeProgram,
+}: InitializeProgramProps): TransactionInstruction {
+  return program.instruction.initializeProgram(
     new BN(transferFeeDistributor),
     new BN(transferFeeProgram),
     authorityPDA.bump,

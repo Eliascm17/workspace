@@ -9,6 +9,7 @@ declare_id!("3uvTgoiGSBz6ntktxo3gwTJY3wDfG73LGNc21AHYiJg2");
 #[program]
 pub mod payment_program {
     use super::*;
+
     pub fn initialize_program(
         ctx: Context<InitializeProgram>,
         config_transfer_fee_distributor: u64,
@@ -69,8 +70,12 @@ pub mod payment_program {
         create_task_index::handler(ctx, process_at, bump)
     }
 
-    pub fn create_payment_index(ctx: Context<CreatePaymentIndex>, bump: u8) -> ProgramResult {
-        create_payment_index::handler(ctx, bump)
+    pub fn create_payment_index(
+        ctx: Context<CreatePaymentIndex>,
+        index_bump: u8,
+        namespace_bump: u8,
+    ) -> ProgramResult {
+        create_payment_index::handler(ctx, index_bump, namespace_bump)
     }
 
     pub fn process_task(ctx: Context<ProcessTask>) -> ProgramResult {

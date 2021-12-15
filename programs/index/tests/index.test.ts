@@ -21,8 +21,8 @@ describe("Index Program", () => {
   const pointerA = Keypair.generate().publicKey;
   const pointerB = Keypair.generate().publicKey;
   const signer = Keypair.generate();
-  const namespace = "abc";
-  const namespaceSerial = "abc_serial";
+  const namespace = Keypair.generate().publicKey;
+  const namespaceSerial = Keypair.generate().publicKey;
   let indexPDA: PDA, pointerPDA: PDA, proofPDA: PDA;
 
   before(async () => {
@@ -33,15 +33,15 @@ describe("Index Program", () => {
   it("creates a serial index", async () => {
     // Find PDAs.
     indexPDA = await findPDA(
-      [SEED_INDEX, owner.publicKey.toBuffer(), Buffer.from(namespaceSerial)],
+      [SEED_INDEX, owner.publicKey.toBuffer(), namespaceSerial.toBuffer()],
       indexProgram.programId
     );
 
     // Generate instructions.
     const ix = createIndex(indexProgram, {
       indexPDA: indexPDA,
-      // signer: owner.publicKey,
       owner: owner.publicKey,
+      payer: owner.publicKey,
       namespace: namespaceSerial,
       isSerial: true,
     });
@@ -52,7 +52,7 @@ describe("Index Program", () => {
     // Validate index account state.
     const indexData = await indexProgram.account.index.fetch(indexPDA.address);
     assert.ok(indexData.owner.toString() === owner.publicKey.toString());
-    assert.ok(indexData.namespace === namespaceSerial);
+    assert.ok(indexData.namespace.toString() === namespaceSerial.toString());
     assert.ok(indexData.isSerial === true);
     assert.ok(indexData.count.toNumber() === 0);
     assert.ok(indexData.bump === indexPDA.bump);
@@ -94,7 +94,7 @@ describe("Index Program", () => {
     // Validate index account data.
     indexData = await indexProgram.account.index.fetch(indexPDA.address);
     assert.ok(indexData.owner.toString() === owner.publicKey.toString());
-    assert.ok(indexData.namespace === namespaceSerial);
+    assert.ok(indexData.namespace.toString() === namespaceSerial.toString());
     assert.ok(indexData.isSerial === true);
     assert.ok(indexData.count.toNumber() === 1);
     assert.ok(indexData.bump === indexPDA.bump);
@@ -149,7 +149,7 @@ describe("Index Program", () => {
     // Validate index account data.
     indexData = await indexProgram.account.index.fetch(indexPDA.address);
     assert.ok(indexData.owner.toString() === owner.publicKey.toString());
-    assert.ok(indexData.namespace === namespaceSerial);
+    assert.ok(indexData.namespace.toString() === namespaceSerial.toString());
     assert.ok(indexData.isSerial === true);
     assert.ok(indexData.count.toNumber() === 2);
     assert.ok(indexData.bump === indexPDA.bump);
@@ -171,15 +171,15 @@ describe("Index Program", () => {
   it("creates a freeform index", async () => {
     // Find index PDA.
     indexPDA = await findPDA(
-      [SEED_INDEX, owner.publicKey.toBuffer(), Buffer.from(namespace)],
+      [SEED_INDEX, owner.publicKey.toBuffer(), namespace.toBuffer()],
       indexProgram.programId
     );
 
     // Generate instructions.
     const ix = createIndex(indexProgram, {
       indexPDA: indexPDA,
-      // signer: owner.publicKey,
       owner: owner.publicKey,
+      payer: owner.publicKey,
       namespace: namespace,
       isSerial: false,
     });
@@ -190,7 +190,7 @@ describe("Index Program", () => {
     // Validate index account state.
     const indexData = await indexProgram.account.index.fetch(indexPDA.address);
     assert.ok(indexData.owner.toString() === owner.publicKey.toString());
-    assert.ok(indexData.namespace === namespace);
+    assert.ok(indexData.namespace.toString() === namespace.toString());
     assert.ok(indexData.isSerial === false);
     assert.ok(indexData.count.toNumber() === 0);
     assert.ok(indexData.bump === indexPDA.bump);
@@ -229,7 +229,7 @@ describe("Index Program", () => {
     // Validate index account data.
     indexData = await indexProgram.account.index.fetch(indexPDA.address);
     assert.ok(indexData.owner.toString() === owner.publicKey.toString());
-    assert.ok(indexData.namespace === namespace);
+    assert.ok(indexData.namespace.toString() === namespace.toString());
     assert.ok(indexData.isSerial === false);
     assert.ok(indexData.count.toNumber() === 1);
     assert.ok(indexData.bump === indexPDA.bump);
@@ -281,7 +281,7 @@ describe("Index Program", () => {
     // Validate index account data.
     indexData = await indexProgram.account.index.fetch(indexPDA.address);
     assert.ok(indexData.owner.toString() === owner.publicKey.toString());
-    assert.ok(indexData.namespace === namespace);
+    assert.ok(indexData.namespace.toString() === namespace.toString());
     assert.ok(indexData.isSerial === false);
     assert.ok(indexData.count.toNumber() === 2);
     assert.ok(indexData.bump === indexPDA.bump);

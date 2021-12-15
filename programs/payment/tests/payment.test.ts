@@ -16,7 +16,7 @@ import {
   PDA,
   signAndSubmit,
 } from "../../../utils";
-import { createRef, initializeProgram } from "../client";
+import * as client from "../client";
 import { SEED_AUTHORITY, SEED_CONFIG, SEED_TREASURY } from "./seeds";
 import { IndexProgram } from "../../../target/types/index_program";
 import { PaymentProgram } from "../../../target/types/payment_program";
@@ -34,21 +34,16 @@ describe("Payment Program", () => {
   const provider = Provider.local();
   const indexProgram = (anchor as any).workspace
     .IndexProgram as Program<IndexProgram>;
-  const paymentProgram = (anchor as any).workspace
-    .PaymentProgram as Program<PaymentProgram>;
   anchor.setProvider(provider);
 
   // Shared data
   let creditor: Keypair;
   let debtor: Keypair;
   let worker: Keypair;
-  let authorityPDA: PDA, configPDA: PDA, treasuryPDA: PDA;
   let taskIndexProcessAt: number;
 
   before(async () => {
-    authorityPDA = await findPDA([SEED_AUTHORITY], paymentProgram.programId);
-    configPDA = await findPDA([SEED_CONFIG], paymentProgram.programId);
-    treasuryPDA = await findPDA([SEED_TREASURY], paymentProgram.programId);
+    await client.loadPDAs(client.program.programId);
     creditor = await newSigner(provider.connection);
     debtor = await newSigner(provider.connection);
     worker = await newSigner(provider.connection);
@@ -61,173 +56,65 @@ describe("Payment Program", () => {
     const transferFeeProgram = 1000;
 
     // Create instructions.
-    const ix = initializeProgram(paymentProgram, {
-      authorityPDA,
-      configPDA,
-      treasuryPDA,
+    const ix = client.initializeProgram({
       signer: signer.publicKey,
       transferFeeDistributor,
       transferFeeProgram,
     });
 
     // Sign and submit transaction.
-    await signAndSubmit(paymentProgram.provider.connection, [ix], signer);
+    await signAndSubmit(client.connection(), [ix], signer);
 
     // Validate config account data.
-    const configData = await paymentProgram.account.config.fetch(
-      configPDA.address
+    const configData = await client.program.account.config.fetch(
+      client.configPDA.address
     );
     assert.ok(
       configData.transferFeeDistributor.toNumber() === transferFeeDistributor
     );
     assert.ok(configData.transferFeeProgram.toNumber() === transferFeeProgram);
-    assert.ok(configData.bump === configPDA.bump);
+    assert.ok(configData.bump === client.configPDA.bump);
 
     // Validate treasury account data.
-    const treasuryData = await paymentProgram.account.treasury.fetch(
-      treasuryPDA.address
+    const treasuryData = await client.program.account.treasury.fetch(
+      client.treasuryPDA.address
     );
-    assert.ok(treasuryData.bump === treasuryPDA.bump);
+    assert.ok(treasuryData.bump === client.treasuryPDA.bump);
   });
 
   it("creates a creditor payment index", async () => {
-    // Generate test data.
-    const SEED_INDEX = Buffer.from("idx");
-    // const namespace = `cp_${creditor.publicKey.toString()}`;
-    const namespace = `abc`;
-    const [creditorPaymentIndexAddress, creditorPaymentIndexBump] =
-      await PublicKey.findProgramAddress(
-        [SEED_INDEX, authorityPDA.address.toBuffer(), Buffer.from(namespace)],
-        indexProgram.programId
-      );
-    let indexPDA: PDA = {
-      address: creditorPaymentIndexAddress,
-      bump: creditorPaymentIndexBump,
-    };
+    // Generate test data
+    const signer = await newSigner(provider.connection);
 
-    console.log("Index: ", indexPDA.address.toString());
-    console.log("Authority: ", authorityPDA.address.toString());
-    console.log("Signer: ", debtor.publicKey.toString());
+    // Generate instruction.
+    const { ix, indexPDA, namespacePDA } = await client.createPaymentIndex({
+      indexProgram: indexProgram.programId,
+      party: debtor.publicKey,
+      payer: signer.publicKey,
+    });
 
-    const sig = await paymentProgram.rpc.createPaymentIndex(
-      creditorPaymentIndexBump,
-      {
-        accounts: {
-          authority: authorityPDA.address,
-          index: indexPDA.address,
-          indexProgram: indexProgram.programId,
-          signer: debtor.publicKey,
-          systemProgram: SystemProgram.programId,
-        },
-        signers: [debtor],
-      }
-    );
+    // Sign and submit transaction.
+    await signAndSubmit(client.connection(), [ix], signer);
 
-    console.log("SIG: ", sig);
-
+    // Validate index account data.
     const indexData = await indexProgram.account.index.fetch(indexPDA.address);
-    console.log("Index data: ", indexData);
-    console.log("Index owner: ", indexData.owner.toString());
+    assert.ok(
+      indexData.owner.toString() === client.authorityPDA.address.toString()
+    );
+    assert.ok(
+      indexData.namespace.toString() === namespacePDA.address.toString()
+    );
+    assert.ok(indexData.count.toNumber() === 0);
+    assert.ok(indexData.isSerial === true);
+    assert.ok(indexData.bump === indexPDA.bump);
 
-    // const createIndexIx = createIndex(indexProgram, {
-    //   indexPDA: indexPDA,
-    //   // signer: debtor.publicKey,
-    //   owner: authorityPDA.address,
-    //   namespace: "abc",
-    //   isSerial: true,
-    // });
-
-    // await signAndSubmit(
-    //   indexProgram.provider.connection,
-    //   [createIndexIx],
-    //   debtor
-    // );
-
-    // const indexData = await indexProgram.account.index.fetch(indexPDA.address);
-    // console.log("IndexData: ", indexData);
-
-    // Run test.
-
-    // Generate pointer PDA
-    // const [pointerAddress, pointerBump] = await PublicKey.findProgramAddress(
-    //   [
-    //     SEED_POINTER,
-    //     indexPDA.address.toBuffer(),
-    //     Buffer.from(indexData.count.toString()),
-    //   ],
-    //   indexProgram.programId
-    // );
-    // const pointerPDA = {
-    //   address: pointerAddress,
-    //   bump: pointerBump,
-    // };
-
-    // Generate proof PDA
-    // const [proofAddress, proofBump] = await PublicKey.findProgramAddress(
-    //   [SEED_PROOF, indexPDA.address.toBuffer(), debtor.publicKey.toBuffer()],
-    //   indexProgram.programId
-    // );
-    // const proofPDA = {
-    //   address: proofAddress,
-    //   bump: proofBump,
-    // };
-
-    // const createRefIx = createRef(paymentProgram, indexProgram, {
-    //   authority: authorityPDA.address,
-    //   index: indexPDA.address,
-    //   signer: debtor.publicKey,
-    //   proofPDA: proofPDA,
-    //   pointerPDA: pointerPDA,
-    //   party: debtor.publicKey,
-    // });
-
-    // console.log("Running sign and submit");
-    // console.log("Authority: ", authorityPDA.address.toString());
-    // console.log("Index: ", indexPDA.address.toString());
-    // console.log("Pointer: ", pointerPDA.address.toString());
-    // console.log("Proof: ", proofPDA.address.toString());
-
-    // await signAndSubmit(
-    //   indexProgram.provider.connection,
-    //   [createRefIx],
-    //   debtor
-    // );
-
-    // console.log("Created pointer and proof!!");
-
-    // console.log(
-    //   "Creditor payment index address: ",
-    //   creditorPaymentIndexAddress.toString()
-    // );
-    // console.log("Authority address: ", authorityPDA.address.toString());
-
-    // await paymentProgram.rpc.createPaymentIndex(
-    //   creditor.publicKey,
-    //   creditorPaymentIndexBump,
-    //   {
-    //     accounts: {
-    //       authority: authorityPDA.address,
-    //       index: creditorPaymentIndexAddress,
-    //       indexProgram: indexProgram.programId,
-    //       signer: debtor.publicKey,
-    //       systemProgram: SystemProgram.programId,
-    //     },
-    //     signers: [debtor],
-    //   }
-    // );
-
-    // console.log("Created a payment index!");
-
-    // Validate state.
-    // await validateCreditorPaymentRefIndexAccountData(
-    //   program,
-    //   creditorPaymentRefIndexAddress,
-    //   {
-    //     count: 0,
-    //     creditor: creditor.publicKey,
-    //     bump: creditorPaymentRefIndexBump,
-    //   }
-    // );
+    // Validate namespace account
+    const namespaceData = await client.program.account.namespace.fetch(
+      namespacePDA.address
+    );
+    assert.ok(namespaceData.party.toString() === debtor.publicKey.toString());
+    assert.ok(Object.keys(namespaceData.role)[0].toString() === "creditor");
+    assert.ok(namespaceData.bump === namespacePDA.bump);
   });
 
   // it("creates a debtor payment index", async () => {
