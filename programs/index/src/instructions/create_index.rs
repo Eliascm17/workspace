@@ -9,8 +9,6 @@ use {
 
 #[derive(Accounts)]
 #[instruction(
-    // owner: Pubkey,
-    // namespace: String,
     is_serial: bool,
     bump: u8,
 )]
@@ -43,8 +41,6 @@ pub struct CreateIndex<'info> {
 
 pub fn handler(
     ctx: Context<CreateIndex>, 
-    // owner: Pubkey,
-    // namespace: String,
     is_serial: bool,
     bump: u8,
 ) -> ProgramResult {

@@ -9,14 +9,7 @@ declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
 pub mod index_program {
     use super::*;
 
-    pub fn create_index(
-        ctx: Context<CreateIndex>,
-        // owner: Pubkey,
-        // namespace: String,
-        is_serial: bool,
-        bump: u8,
-    ) -> ProgramResult {
-        // create_index::handler(ctx, owner, namespace, is_serial, bump)
+    pub fn create_index(ctx: Context<CreateIndex>, is_serial: bool, bump: u8) -> ProgramResult {
         create_index::handler(ctx, is_serial, bump)
     }
 
