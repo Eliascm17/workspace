@@ -9,19 +9,9 @@ import {
   SystemProgram,
   SYSVAR_CLOCK_PUBKEY,
 } from "@solana/web3.js";
-import {
-  dateToSeconds,
-  findPDA,
-  newSigner,
-  PDA,
-  signAndSubmit,
-} from "../../../utils";
+import { newSigner, signAndSubmit } from "../../../utils";
 import * as client from "../client";
-import { SEED_AUTHORITY, SEED_CONFIG, SEED_TREASURY } from "./seeds";
 import { IndexProgram } from "../../../target/types/index_program";
-import { PaymentProgram } from "../../../target/types/payment_program";
-import { createIndex } from "../../index/client";
-import { SEED_POINTER, SEED_PROOF } from "../../index/tests/seeds";
 
 // Mints
 const WSOL_MINT = new PublicKey("So11111111111111111111111111111111111111112");
