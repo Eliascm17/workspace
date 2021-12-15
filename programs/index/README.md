@@ -2,7 +2,6 @@
 
 The **Index Program** can create virtual namespaces for indexing Solana accounts on-chain. It provides [key-value stores (KVS)](https://en.wikipedia.org/wiki/Key%E2%80%93value_database) for mapping account addresses to more predictable names. It supports creating indicies with either serial namespaces (0, 1, 2, 3 ... like an array) or freeform namespaces ("foo", "bar", "baz" ... like a hashmap). It additionally supports constant-time "reverse-lookup" searches from an address to its name in an index.
 
-
 ## 👉 Getting Started
 
 ### Integrate and build
@@ -30,12 +29,9 @@ anchor build
 anchor test
 ```
 
-
 ## ⚙️ How It Works
 
 ![Frame 40159](https://user-images.githubusercontent.com/8634334/146040947-f246e623-b105-447e-8ab4-bc4a59eabc52.png)
-
-
 
 ## 🦀 CPI Examples
 
@@ -52,23 +48,25 @@ use {
     crate::state::*,
     anchor_lang::{prelude::*, solana_program::system_program},
     index_program::{
-        cpi::{accounts::CreateIndex, create_index},
-        program::index_program,
-        state::Index,
-    },
+        cpi::{
+            accounts::CreateIndex,
+            create_index,
+        },
+        program::IndexProgram,
+    }
 };
 
 #[derive(Accounts)]
-#[instruction(namespace: String, bump: u8)]
+#[instruction(bump: u8)]
 pub struct CreateMyIndex<'info> {
     #[account(mut, seeds = [SEED_AUTHORITY], bump = authority.bump)]
     pub authority: Account<'info, Authority>,
 
     #[account(mut)]
-    pub index: Account<'info, Index>,
+    pub index: AccountInfo<'info>,
 
     #[account(address = index_program::ID)]
-    pub index_program: Program<'info, Index>,
+    pub index_program: Program<'info, IndexProgram>,
 
     #[account(mut)]
     pub signer: Signer<'info>,
@@ -77,26 +75,28 @@ pub struct CreateMyIndex<'info> {
     pub system_program: Program<'info, System>,
 }
 
-pub fn handler(ctx: Context<CreateMyIndex>, namespace: String, bump: u8) -> ProgramResult {
+pub fn handler(ctx: Context<CreateMyIndex>, bump: u8) -> ProgramResult {
     // Get accounts.
     let authority = &ctx.accounts.authority;
     let index = &ctx.accounts.index;
+    let signer = &ctx.accounts.signer;
     let index_program = &ctx.accounts.index_program;
     let system_program = &ctx.accounts.system_program;
 
-    // Initialize index account.
+    // Create an index owned by the program authority.
     create_index(
         CpiContext::new_with_signer(
             index_program.to_account_info(),
             CreateIndex {
                 index: index.to_account_info(),
-                signer: authority.to_account_info(),
+                owner: authority.to_account_info(),
+                payer: signer.to_account_info(),
                 system_program: system_program.to_account_info(),
             },
             &[&[SEED_AUTHORITY, &[authority.bump]]],
         ),
-        namespace,
-        false,
+        String::from("abc"),
+        true,
         bump,
     )
 }

@@ -31,6 +31,7 @@ export function createPointer(
         pointer: pointerPDA.address,
         proof: proofPDA.address,
         owner: owner,
+        payer: owner,
         systemProgram: SystemProgram.programId,
       },
     }

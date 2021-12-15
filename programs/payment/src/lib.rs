@@ -69,13 +69,8 @@ pub mod payment_program {
         create_task_index::handler(ctx, process_at, bump)
     }
 
-    pub fn create_ref(
-        ctx: Context<CreateRef>,
-        party: Pubkey,
-        pointer_bump: u8,
-        proof_bump: u8,
-    ) -> ProgramResult {
-        create_ref::handler(ctx, party, pointer_bump, proof_bump)
+    pub fn create_payment_index(ctx: Context<CreatePaymentIndex>, bump: u8) -> ProgramResult {
+        create_payment_index::handler(ctx, bump)
     }
 
     pub fn process_task(ctx: Context<ProcessTask>) -> ProgramResult {

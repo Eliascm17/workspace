@@ -11,12 +11,13 @@ pub mod index_program {
 
     pub fn create_index(
         ctx: Context<CreateIndex>,
-        owner: Pubkey,
+        // owner: Pubkey,
         namespace: String,
         is_serial: bool,
         bump: u8,
     ) -> ProgramResult {
-        create_index::handler(ctx, owner, namespace, is_serial, bump)
+        // create_index::handler(ctx, owner, namespace, is_serial, bump)
+        create_index::handler(ctx, namespace, is_serial, bump)
     }
 
     pub fn create_pointer(

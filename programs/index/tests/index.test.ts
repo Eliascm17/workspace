@@ -40,7 +40,7 @@ describe("Index Program", () => {
     // Generate instructions.
     const ix = createIndex(indexProgram, {
       indexPDA: indexPDA,
-      signer: owner.publicKey,
+      // signer: owner.publicKey,
       owner: owner.publicKey,
       namespace: namespaceSerial,
       isSerial: true,
@@ -178,7 +178,7 @@ describe("Index Program", () => {
     // Generate instructions.
     const ix = createIndex(indexProgram, {
       indexPDA: indexPDA,
-      signer: owner.publicKey,
+      // signer: owner.publicKey,
       owner: owner.publicKey,
       namespace: namespace,
       isSerial: false,

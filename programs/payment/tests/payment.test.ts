@@ -105,71 +105,95 @@ describe("Payment Program", () => {
       bump: creditorPaymentIndexBump,
     };
 
-    const createIndexIx = createIndex(indexProgram, {
-      indexPDA: indexPDA,
-      signer: debtor.publicKey,
-      owner: authorityPDA.address,
-      namespace: "abc",
-      isSerial: true,
-    });
+    console.log("Index: ", indexPDA.address.toString());
+    console.log("Authority: ", authorityPDA.address.toString());
+    console.log("Signer: ", debtor.publicKey.toString());
 
-    await signAndSubmit(
-      indexProgram.provider.connection,
-      [createIndexIx],
-      debtor
+    const sig = await paymentProgram.rpc.createPaymentIndex(
+      creditorPaymentIndexBump,
+      {
+        accounts: {
+          authority: authorityPDA.address,
+          index: indexPDA.address,
+          indexProgram: indexProgram.programId,
+          signer: debtor.publicKey,
+          systemProgram: SystemProgram.programId,
+        },
+        signers: [debtor],
+      }
     );
 
+    console.log("SIG: ", sig);
+
     const indexData = await indexProgram.account.index.fetch(indexPDA.address);
-    console.log("IndexData: ", indexData);
+    console.log("Index data: ", indexData);
+    console.log("Index owner: ", indexData.owner.toString());
+
+    // const createIndexIx = createIndex(indexProgram, {
+    //   indexPDA: indexPDA,
+    //   // signer: debtor.publicKey,
+    //   owner: authorityPDA.address,
+    //   namespace: "abc",
+    //   isSerial: true,
+    // });
+
+    // await signAndSubmit(
+    //   indexProgram.provider.connection,
+    //   [createIndexIx],
+    //   debtor
+    // );
+
+    // const indexData = await indexProgram.account.index.fetch(indexPDA.address);
+    // console.log("IndexData: ", indexData);
 
     // Run test.
 
     // Generate pointer PDA
-    const [pointerAddress, pointerBump] = await PublicKey.findProgramAddress(
-      [
-        SEED_POINTER,
-        indexPDA.address.toBuffer(),
-        Buffer.from(indexData.count.toString()),
-      ],
-      indexProgram.programId
-    );
-    const pointerPDA = {
-      address: pointerAddress,
-      bump: pointerBump,
-    };
+    // const [pointerAddress, pointerBump] = await PublicKey.findProgramAddress(
+    //   [
+    //     SEED_POINTER,
+    //     indexPDA.address.toBuffer(),
+    //     Buffer.from(indexData.count.toString()),
+    //   ],
+    //   indexProgram.programId
+    // );
+    // const pointerPDA = {
+    //   address: pointerAddress,
+    //   bump: pointerBump,
+    // };
 
     // Generate proof PDA
-    const [proofAddress, proofBump] = await PublicKey.findProgramAddress(
-      [SEED_PROOF, indexPDA.address.toBuffer(), debtor.publicKey.toBuffer()],
-      indexProgram.programId
-    );
-    const proofPDA = {
-      address: proofAddress,
-      bump: proofBump,
-    };
+    // const [proofAddress, proofBump] = await PublicKey.findProgramAddress(
+    //   [SEED_PROOF, indexPDA.address.toBuffer(), debtor.publicKey.toBuffer()],
+    //   indexProgram.programId
+    // );
+    // const proofPDA = {
+    //   address: proofAddress,
+    //   bump: proofBump,
+    // };
 
-    const createRefIx = createRef(paymentProgram, indexProgram, {
-      authority: authorityPDA.address,
-      index: indexPDA.address,
-      signer: debtor.publicKey,
-      proofPDA: proofPDA,
-      pointerPDA: pointerPDA,
-      party: debtor.publicKey,
-    });
+    // const createRefIx = createRef(paymentProgram, indexProgram, {
+    //   authority: authorityPDA.address,
+    //   index: indexPDA.address,
+    //   signer: debtor.publicKey,
+    //   proofPDA: proofPDA,
+    //   pointerPDA: pointerPDA,
+    //   party: debtor.publicKey,
+    // });
 
-    console.log("Running sign and submit");
-    console.log("Authority: ", authorityPDA.address.toString());
-    console.log("Index: ", indexPDA.address.toString());
-    console.log("Pointer: ", pointerPDA.address.toString());
-    console.log("Proof: ", proofPDA.address.toString());
+    // console.log("Running sign and submit");
+    // console.log("Authority: ", authorityPDA.address.toString());
+    // console.log("Index: ", indexPDA.address.toString());
+    // console.log("Pointer: ", pointerPDA.address.toString());
+    // console.log("Proof: ", proofPDA.address.toString());
 
-    await signAndSubmit(
-      indexProgram.provider.connection,
-      [createRefIx],
-      debtor
-    );
+    // await signAndSubmit(
+    //   indexProgram.provider.connection,
+    //   [createRefIx],
+    //   debtor
+    // );
 
-    console.log("Created pointer and proof!!");
+    // console.log("Created pointer and proof!!");
 
     // console.log(
     //   "Creditor payment index address: ",
@@ -192,7 +216,7 @@ describe("Payment Program", () => {
     //   }
     // );
 
-    console.log("Created a payment index!");
+    // console.log("Created a payment index!");
 
     // Validate state.
     // await validateCreditorPaymentRefIndexAccountData(

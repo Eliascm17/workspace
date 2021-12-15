@@ -31,6 +31,12 @@ pub struct CreatePointer<'info> {
     )]
     pub index: Account<'info, state::Index>,
 
+    #[account(mut)]
+    pub owner: Signer<'info>,
+
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
     #[account(
         init,
         seeds = [
@@ -39,7 +45,7 @@ pub struct CreatePointer<'info> {
             name.as_bytes(),
         ],
         bump = item_bump,
-        payer = owner,
+        payer = payer,
         space = 8 + size_of::<state::Pointer>(),
     )]
     pub pointer: Account<'info, state::Pointer>,
@@ -52,13 +58,10 @@ pub struct CreatePointer<'info> {
             value.as_ref(),
         ],
         bump = proof_bump,
-        payer = owner,
+        payer = payer,
         space = 8 + size_of::<state::Proof>(),
     )]
     pub proof: Account<'info, state::Proof>,
-
-    #[account(mut)]
-    pub owner: Signer<'info>,
     
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
