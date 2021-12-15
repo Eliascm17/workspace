@@ -1,3 +1,3 @@
-# Programs
+# Workspace
 
-A collection of open-source payments primitives for Solana.
+An open-source collection of payment primitives for Solana developers.
