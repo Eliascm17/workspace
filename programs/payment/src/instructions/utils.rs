@@ -6,8 +6,8 @@ pub const ONE_MINUTE: u64 = 60;
 
 pub fn _payment_index_namespace(party: Pubkey, role: Role) -> String {
     match role {
-        Role::Creditor => format!("faktor.payments.creditor.{}", party.to_string()),
-        Role::Debtor => format!("faktor.payments.debtor.{}", party.to_string()),
+        Role::Creditor => format!("cp_{}", party.to_string()),
+        Role::Debtor => format!("dp_{}", party.to_string()),
     }
 }
 

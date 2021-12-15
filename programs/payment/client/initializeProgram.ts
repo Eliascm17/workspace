@@ -4,8 +4,8 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { PaymentProgram } from "../../../../target/types/payment_program";
-import { PDA } from "../../../../utils";
+import { PaymentProgram } from "../../../target/types/payment_program";
+import { PDA } from "../../../utils";
 
 export type initializeProgramProps = {
   authorityPDA: PDA;

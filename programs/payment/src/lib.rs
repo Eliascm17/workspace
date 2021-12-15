@@ -2,7 +2,7 @@ pub mod errors;
 mod instructions;
 pub mod state;
 
-use {anchor_lang::prelude::*, instructions::*, state::*};
+use {anchor_lang::prelude::*, instructions::*};
 
 declare_id!("3uvTgoiGSBz6ntktxo3gwTJY3wDfG73LGNc21AHYiJg2");
 
@@ -69,13 +69,13 @@ pub mod payment_program {
         create_task_index::handler(ctx, process_at, bump)
     }
 
-    pub fn create_payment_index(
-        ctx: Context<CreatePaymentIndex>,
+    pub fn create_ref(
+        ctx: Context<CreateRef>,
         party: Pubkey,
-        role: Role,
-        bump: u8,
+        pointer_bump: u8,
+        proof_bump: u8,
     ) -> ProgramResult {
-        create_payment_index::handler(ctx, party, role, bump)
+        create_ref::handler(ctx, party, pointer_bump, proof_bump)
     }
 
     pub fn process_task(ctx: Context<ProcessTask>) -> ProgramResult {

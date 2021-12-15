@@ -4,8 +4,8 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from "@solana/web3.js";
-import { IndexProgram } from "../../../../target/types/index_program";
-import { PDA } from "../../../../utils";
+import { IndexProgram } from "../../../target/types/index_program";
+import { PDA } from "../../../utils";
 
 export type CreatePointerProps = {
   indexPDA: PDA;

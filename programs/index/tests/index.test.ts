@@ -4,9 +4,9 @@ import * as anchor from "@project-serum/anchor";
 import { Program } from "@project-serum/anchor";
 import { Keypair } from "@solana/web3.js";
 
-import { createIndex, createPointer } from "./instructions";
 import { SEED_INDEX, SEED_POINTER, SEED_PROOF } from "./seeds";
 
+import { createIndex, createPointer } from "../client";
 import { IndexProgram } from "../../../target/types/index_program";
 import { airdrop, findPDA, PDA, signAndSubmit } from "../../../utils";
 
@@ -20,12 +20,14 @@ describe("Index Program", () => {
   const owner = Keypair.generate();
   const pointerA = Keypair.generate().publicKey;
   const pointerB = Keypair.generate().publicKey;
+  const signer = Keypair.generate();
   const namespace = "abc";
   const namespaceSerial = "abc_serial";
   let indexPDA: PDA, pointerPDA: PDA, proofPDA: PDA;
 
   before(async () => {
     await airdrop(1, owner.publicKey, indexProgram.provider.connection);
+    await airdrop(1, signer.publicKey, indexProgram.provider.connection);
   });
 
   it("creates a serial index", async () => {
@@ -38,6 +40,7 @@ describe("Index Program", () => {
     // Generate instructions.
     const ix = createIndex(indexProgram, {
       indexPDA: indexPDA,
+      signer: owner.publicKey,
       owner: owner.publicKey,
       namespace: namespaceSerial,
       isSerial: true,
@@ -175,6 +178,7 @@ describe("Index Program", () => {
     // Generate instructions.
     const ix = createIndex(indexProgram, {
       indexPDA: indexPDA,
+      signer: owner.publicKey,
       owner: owner.publicKey,
       namespace: namespace,
       isSerial: false,
